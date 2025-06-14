@@ -1,6 +1,5 @@
-// 預設資料結構
-const EXPLORATION_DATA = {
-    // 特質清單 - 基於多維度分類
+export const EXPLORATION_DATA = {
+    // 預設資料結構
     traits: {
         // --- 分析思考維度 ---
         logical_reasoning: {
@@ -499,7 +498,7 @@ const EXPLORATION_DATA = {
 };
 
 // 特質分析工具
-const TraitAnalyzer = {
+export const TraitAnalyzer = {
     // 使用 Gemini 分析使用者輸入中的特質
     async analyzeTraits(text) {
         const prompt = `請分析以下使用者描述的經驗，並根據我們定義的特質資料庫進行語意比對。

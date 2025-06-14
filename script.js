@@ -1,6 +1,8 @@
 // 導入資料和分析工具
 import { EXPLORATION_DATA, TraitAnalyzer } from './data.js';
 
+console.log('script.js 檔案開始載入並執行。');
+
 // Global variables
 let currentStage = 0;
 const totalStages = 2;
@@ -25,6 +27,8 @@ async function initGeminiAPI() {
     const apiKey = localStorage.getItem('geminiApiKey');
     if (!apiKey) {
         console.error('initGeminiAPI: 未找到 API 金鑰');
+        // 為了測試，如果沒有 API 金鑰，強制彈出 alert
+        // alert('TEST: API 金鑰不存在！'); 
         throw new Error('請先設定 Gemini API 金鑰');
     }
     
@@ -47,7 +51,7 @@ async function initGeminiAPI() {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({error: {message: '無法解析 API 錯誤回應'}})); // 嘗試解析 JSON，如果失敗則提供預設錯誤
                     const errorMessage = errorData.error?.message || 'API 請求失敗';
                     console.error('Gemini generateText: API 請求失敗', response.status, errorMessage);
                     throw new Error(errorMessage);
@@ -356,96 +360,5 @@ function updateProgress(percentage) {
 
 // 特質分析工具
 const TraitAnalyzer = {
-    // 使用 Gemini 分析使用者輸入中的特質
-    async analyzeTraits(text) {
-        const prompt = `請分析以下使用者描述的經驗，並根據我們定義的特質資料庫進行語意比對。
-使用者描述：「${text}」
-
-特質資料庫：
-${Object.entries(EXPLORATION_DATA.traits).map(([id, trait]) => 
-    `- ${trait.name} (${id}): ${trait.description}
-  關鍵字：${trait.keywords.join('、')}`
-).join('\n')}
-
-請根據使用者描述的行為、思考模式和感受，判斷最符合的幾個特質，並給出每個特質的相關程度（0-1分）。
-請以 JSON 格式回傳，格式如下：
-{
-    "traits": [
-        {
-            "id": "特質ID",
-            "score": 相關程度分數,
-            "reason": "為什麼這個特質符合使用者描述"
-        }
-    ]
-}`;
-
-        try {
-            const response = await window.gemini.generateText(prompt);
-            const analysis = JSON.parse(response);
-            
-            // 將分析結果轉換為特質物件陣列
-            return analysis.traits.map(trait => ({
-                ...EXPLORATION_DATA.traits[trait.id],
-                score: trait.score,
-                reason: trait.reason
-            })).sort((a, b) => b.score - a.score);
-        } catch (error) {
-            console.error('特質分析失敗:', error);
-            return [];
-        }
-    },
-
-    // 根據特質推薦學群
-    suggestLearningGroups(traits) {
-        const groupScores = {};
-        
-        traits.forEach(trait => {
-            Object.values(EXPLORATION_DATA.learningGroups).forEach(group => {
-                if (group.relatedTraits.includes(trait.id)) {
-                    if (!groupScores[group.id]) {
-                        groupScores[group.id] = 0;
-                    }
-                    // 使用特質分數加權計算
-                    groupScores[group.id] += trait.score;
-                }
-            });
-        });
-
-        return Object.entries(groupScores)
-            .map(([groupId, score]) => ({
-                ...EXPLORATION_DATA.learningGroups[groupId],
-                score,
-                matchingTraits: traits.filter(t => 
-                    EXPLORATION_DATA.learningGroups[groupId].relatedTraits.includes(t.id)
-                )
-            }))
-            .sort((a, b) => b.score - a.score);
-    },
-
-    // 根據特質推薦角色模型
-    suggestRoleModels(traits) {
-        const modelScores = {};
-        
-        traits.forEach(trait => {
-            Object.values(EXPLORATION_DATA.roleModels).forEach(model => {
-                if (model.traits.includes(trait.id)) {
-                    if (!modelScores[model.id]) {
-                        modelScores[model.id] = 0;
-                    }
-                    // 使用特質分數加權計算
-                    modelScores[model.id] += trait.score;
-                }
-            });
-        });
-
-        return Object.entries(modelScores)
-            .map(([modelId, score]) => ({
-                ...EXPLORATION_DATA.roleModels[modelId],
-                score,
-                matchingTraits: traits.filter(t => 
-                    EXPLORATION_DATA.roleModels[modelId].traits.includes(t.id)
-                )
-            }))
-            .sort((a, b) => b.score - a.score);
-    }
+    // ... existing code ...
 }; 
