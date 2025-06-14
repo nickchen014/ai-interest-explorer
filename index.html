@@ -34,7 +34,7 @@
                 準備好一起發掘你獨特的閃光點，找到讓你怦然心動的學習方向了嗎？<br>
                 接下來，我們將透過輕鬆的對話，一步步畫出屬於你的「個人探索回饋卡」。
             </p>
-            <button id="startButton" class="button">準備好了，開始探索！🚀</button>
+            <button id="startButton" class="button" type="button">準備好了，開始探索！🚀</button>
         </div>
 
         <div id="stage1" class="stage card hidden">
@@ -80,6 +80,25 @@
                 apiKeyStatus.textContent = 'API 金鑰已儲存';
                 apiKeyStatus.className = 'text-sm text-green-600';
                 welcomeMessage.classList.remove('hidden');
+                
+                // 確保開始按鈕可以點擊
+                if (startButton) {
+                    startButton.disabled = false;
+                    // 移除舊的事件監聽器（如果有的話）
+                    startButton.replaceWith(startButton.cloneNode(true));
+                    // 重新獲取按鈕元素
+                    const newStartButton = document.getElementById('startButton');
+                    // 添加新的事件監聽器
+                    newStartButton.addEventListener('click', () => {
+                        console.log('開始按鈕被點擊');
+                        try {
+                            startExploration();
+                        } catch (error) {
+                            console.error('啟動失敗:', error);
+                            alert('啟動失敗：' + error.message);
+                        }
+                    });
+                }
             } else {
                 apiKeyStatus.textContent = '請輸入有效的 API 金鑰';
                 apiKeyStatus.className = 'text-sm text-red-600';
@@ -91,6 +110,9 @@
             apiKeyStatus.textContent = '請先輸入 Gemini API 金鑰';
             apiKeyStatus.className = 'text-sm text-yellow-600';
             welcomeMessage.classList.add('hidden');
+            if (startButton) {
+                startButton.disabled = true;
+            }
         }
     </script>
     <script type="module" src="./script.js"></script>
