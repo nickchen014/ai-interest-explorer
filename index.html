@@ -55,66 +55,6 @@
             <button id="goToStage3Button" onclick="proceedToNextStage(3)" class="button button-secondary w-full mt-3" style="display: none;">繼續探索</button>
         </div>
     </div>
-    <script type="module">
-        // 初始化 API 金鑰管理
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
-        const apiKeyStatus = document.getElementById('apiKeyStatus');
-        const welcomeMessage = document.getElementById('welcomeMessage');
-        const startButton = document.getElementById('startButton');
-
-        // 從 localStorage 讀取 API 金鑰
-        const savedApiKey = localStorage.getItem('geminiApiKey');
-        if (savedApiKey) {
-            apiKeyInput.value = savedApiKey;
-            apiKeyStatus.textContent = '已載入已儲存的 API 金鑰';
-            apiKeyStatus.className = 'text-sm text-green-600';
-            welcomeMessage.classList.remove('hidden');
-        }
-
-        // 儲存 API 金鑰
-        saveApiKeyButton.addEventListener('click', () => {
-            const apiKey = apiKeyInput.value.trim();
-            if (apiKey) {
-                localStorage.setItem('geminiApiKey', apiKey);
-                apiKeyStatus.textContent = 'API 金鑰已儲存';
-                apiKeyStatus.className = 'text-sm text-green-600';
-                welcomeMessage.classList.remove('hidden');
-                
-                // 確保開始按鈕可以點擊
-                if (startButton) {
-                    startButton.disabled = false;
-                    // 移除舊的事件監聽器（如果有的話）
-                    startButton.replaceWith(startButton.cloneNode(true));
-                    // 重新獲取按鈕元素
-                    const newStartButton = document.getElementById('startButton');
-                    // 添加新的事件監聽器
-                    newStartButton.addEventListener('click', () => {
-                        console.log('開始按鈕被點擊');
-                        try {
-                            startExploration();
-                        } catch (error) {
-                            console.error('啟動失敗:', error);
-                            alert('啟動失敗：' + error.message);
-                        }
-                    });
-                }
-            } else {
-                apiKeyStatus.textContent = '請輸入有效的 API 金鑰';
-                apiKeyStatus.className = 'text-sm text-red-600';
-            }
-        });
-
-        // 檢查 API 金鑰是否已設定
-        if (!savedApiKey) {
-            apiKeyStatus.textContent = '請先輸入 Gemini API 金鑰';
-            apiKeyStatus.className = 'text-sm text-yellow-600';
-            welcomeMessage.classList.add('hidden');
-            if (startButton) {
-                startButton.disabled = true;
-            }
-        }
-    </script>
     <script type="module" src="./script.js"></script>
 </body>
 </html> 

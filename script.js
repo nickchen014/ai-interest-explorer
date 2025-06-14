@@ -12,6 +12,13 @@ let userTraits = [];
 let suggestedGroups = [];
 let suggestedModels = [];
 
+// DOM Elements
+const apiKeyInput = document.getElementById('apiKeyInput');
+const saveApiKeyButton = document.getElementById('saveApiKeyButton');
+const apiKeyStatus = document.getElementById('apiKeyStatus');
+const welcomeMessage = document.getElementById('welcomeMessage');
+const startButton = document.getElementById('startButton');
+
 // 初始化 Gemini API
 async function initGeminiAPI() {
     const apiKey = localStorage.getItem('geminiApiKey');
@@ -38,10 +45,14 @@ async function initGeminiAPI() {
                 });
 
                 if (!response.ok) {
-                    throw new Error('API 請求失敗');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'API 請求失敗');
                 }
 
                 const data = await response.json();
+                if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    throw new Error('API 回應格式不正確');
+                }
                 return data.candidates[0].content.parts[0].text;
             } catch (error) {
                 console.error('Gemini API 錯誤:', error);
@@ -49,36 +60,112 @@ async function initGeminiAPI() {
             }
         }
     };
+
+    // 測試 API 連接
+    try {
+        await window.gemini.generateText('test connection');
+        console.log('Gemini API 連接成功');
+        return true;
+    } catch (error) {
+        console.error('Gemini API 連接測試失敗:', error);
+        throw error;
+    }
 }
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        await initGeminiAPI();
-        const startButton = document.getElementById('startButton');
+    console.log('DOM Content Loaded');
+    
+    // 從 localStorage 讀取 API 金鑰
+    const savedApiKey = localStorage.getItem('geminiApiKey');
+    if (savedApiKey) {
+        apiKeyInput.value = savedApiKey;
+        apiKeyStatus.textContent = '已載入已儲存的 API 金鑰';
+        apiKeyStatus.className = 'text-sm text-green-600';
+        welcomeMessage.classList.remove('hidden');
         if (startButton) {
-            startButton.addEventListener('click', () => {
-                try {
-                    startExploration();
-                } catch (error) {
-                    console.error('啟動探索失敗:', error);
-                    alert('啟動失敗，請確認 API 金鑰是否正確');
-                }
-            });
+            startButton.disabled = false;
+            startButton.title = '開始探索';
         }
-    } catch (error) {
-        console.error('初始化失敗:', error);
-        alert(error.message);
+    } else {
+        apiKeyStatus.textContent = '請先輸入 Gemini API 金鑰';
+        apiKeyStatus.className = 'text-sm text-yellow-600';
+        welcomeMessage.classList.add('hidden');
+        if (startButton) {
+            startButton.disabled = true;
+            startButton.title = '請先設定 API 金鑰';
+        }
+    }
+
+    // 儲存 API 金鑰
+    saveApiKeyButton.addEventListener('click', async () => {
+        const apiKey = apiKeyInput.value.trim();
+        if (apiKey) {
+            localStorage.setItem('geminiApiKey', apiKey);
+            apiKeyStatus.textContent = 'API 金鑰已儲存';
+            apiKeyStatus.className = 'text-sm text-green-600';
+            welcomeMessage.classList.remove('hidden');
+            if (startButton) {
+                startButton.disabled = false;
+                startButton.title = '開始探索';
+            }
+            // 嘗試初始化 Gemini API
+            try {
+                await initGeminiAPI();
+                alert('API 金鑰儲存成功，並已驗證。現在可以開始探索了！');
+            } catch (error) {
+                alert('API 金鑰儲存成功，但連接測試失敗：' + error.message + ' 請檢查您的金鑰是否正確。');
+            }
+        } else {
+            apiKeyStatus.textContent = '請輸入有效的 API 金鑰';
+            apiKeyStatus.className = 'text-sm text-red-600';
+            welcomeMessage.classList.add('hidden');
+            if (startButton) {
+                startButton.disabled = true;
+                startButton.title = '請先設定 API 金鑰';
+            }
+        }
+    });
+
+    // 開始按鈕事件監聽器
+    if (startButton) {
+        console.log('設置開始按鈕事件監聽器');
+        // 確保移除舊的事件監聽器，避免重複綁定
+        startButton.replaceWith(startButton.cloneNode(true));
+        const newStartButton = document.getElementById('startButton'); // 重新獲取元素
+
+        newStartButton.addEventListener('click', async () => {
+            console.log('開始按鈕被點擊');
+            try {
+                // 初始化 API
+                await initGeminiAPI();
+                // 開始探索
+                startExploration();
+            } catch (error) {
+                console.error('啟動失敗:', error);
+                alert('啟動失敗：' + error.message);
+            }
+        });
     }
 });
 
 // Start the exploration process
 function startExploration() {
-    document.getElementById('welcomeMessage').classList.add('hidden');
+    console.log('開始探索流程');
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    if (welcomeMessage) {
+        welcomeMessage.classList.add('hidden');
+    }
+    
     showStage(1);
     updateProgress(0);
     addAIMessage(1, "你好！讓我們開始探索你的經驗。請分享一個讓你印象深刻，或是特別有成就感的經驗。這個經驗可以是任何時候發生的，重要的是它對你來說很有意義。");
 }
+
+// 暴露給全域，以便在 HTML 中直接呼叫
+window.startExploration = startExploration;
+window.handleStageUserInput = handleStageUserInput;
+window.proceedToNextStage = proceedToNextStage;
 
 // Show a specific stage
 function showStage(stageNumber) {
