@@ -21,14 +21,16 @@ const startButton = document.getElementById('startButton');
 
 // 初始化 Gemini API
 async function initGeminiAPI() {
+    console.log('initGeminiAPI: 嘗試初始化 Gemini API');
     const apiKey = localStorage.getItem('geminiApiKey');
     if (!apiKey) {
+        console.error('initGeminiAPI: 未找到 API 金鑰');
         throw new Error('請先設定 Gemini API 金鑰');
     }
     
-    // 初始化 Gemini API
     window.gemini = {
         async generateText(prompt) {
+            console.log('Gemini generateText: 正在發送請求...', prompt.substring(0, 50) + '...');
             try {
                 const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKey, {
                     method: 'POST',
@@ -46,13 +48,17 @@ async function initGeminiAPI() {
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error?.message || 'API 請求失敗');
+                    const errorMessage = errorData.error?.message || 'API 請求失敗';
+                    console.error('Gemini generateText: API 請求失敗', response.status, errorMessage);
+                    throw new Error(errorMessage);
                 }
 
                 const data = await response.json();
                 if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    console.error('Gemini generateText: API 回應格式不正確', data);
                     throw new Error('API 回應格式不正確');
                 }
+                console.log('Gemini generateText: 請求成功');
                 return data.candidates[0].content.parts[0].text;
             } catch (error) {
                 console.error('Gemini API 錯誤:', error);
@@ -63,22 +69,24 @@ async function initGeminiAPI() {
 
     // 測試 API 連接
     try {
+        console.log('initGeminiAPI: 執行連接測試');
         await window.gemini.generateText('test connection');
         console.log('Gemini API 連接成功');
         return true;
     } catch (error) {
-        console.error('Gemini API 連接測試失敗:', error);
+        console.error('initGeminiAPI: 連接測試失敗', error);
         throw error;
     }
 }
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM Content Loaded');
+    console.log('DOMContentLoaded: 頁面載入完成');
     
     // 從 localStorage 讀取 API 金鑰
     const savedApiKey = localStorage.getItem('geminiApiKey');
     if (savedApiKey) {
+        console.log('DOMContentLoaded: 找到已儲存的 API 金鑰');
         apiKeyInput.value = savedApiKey;
         apiKeyStatus.textContent = '已載入已儲存的 API 金鑰';
         apiKeyStatus.className = 'text-sm text-green-600';
@@ -88,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             startButton.title = '開始探索';
         }
     } else {
+        console.log('DOMContentLoaded: 未找到 API 金鑰');
         apiKeyStatus.textContent = '請先輸入 Gemini API 金鑰';
         apiKeyStatus.className = 'text-sm text-yellow-600';
         welcomeMessage.classList.add('hidden');
@@ -97,8 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 儲存 API 金鑰
+    // 儲存 API 金鑰按鈕事件監聽器
     saveApiKeyButton.addEventListener('click', async () => {
+        console.log('saveApiKeyButton: 按鈕被點擊');
         const apiKey = apiKeyInput.value.trim();
         if (apiKey) {
             localStorage.setItem('geminiApiKey', apiKey);
@@ -111,12 +121,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             // 嘗試初始化 Gemini API
             try {
+                console.log('saveApiKeyButton: 嘗試初始化 API');
                 await initGeminiAPI();
                 alert('API 金鑰儲存成功，並已驗證。現在可以開始探索了！');
             } catch (error) {
+                console.error('saveApiKeyButton: API 初始化失敗', error);
                 alert('API 金鑰儲存成功，但連接測試失敗：' + error.message + ' 請檢查您的金鑰是否正確。');
             }
         } else {
+            console.log('saveApiKeyButton: API 金鑰為空');
             apiKeyStatus.textContent = '請輸入有效的 API 金鑰';
             apiKeyStatus.className = 'text-sm text-red-600';
             welcomeMessage.classList.add('hidden');
@@ -129,20 +142,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 開始按鈕事件監聽器
     if (startButton) {
-        console.log('設置開始按鈕事件監聽器');
+        console.log('startButton: 設置開始按鈕事件監聽器');
         // 確保移除舊的事件監聽器，避免重複綁定
         startButton.replaceWith(startButton.cloneNode(true));
         const newStartButton = document.getElementById('startButton'); // 重新獲取元素
 
         newStartButton.addEventListener('click', async () => {
-            console.log('開始按鈕被點擊');
+            console.log('startButton: 開始按鈕被點擊');
             try {
                 // 初始化 API
                 await initGeminiAPI();
                 // 開始探索
                 startExploration();
             } catch (error) {
-                console.error('啟動失敗:', error);
+                console.error('startButton: 啟動失敗', error);
                 alert('啟動失敗：' + error.message);
             }
         });
@@ -151,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Start the exploration process
 function startExploration() {
-    console.log('開始探索流程');
+    console.log('startExploration: 開始探索流程');
     const welcomeMessage = document.getElementById('welcomeMessage');
     if (welcomeMessage) {
         welcomeMessage.classList.add('hidden');
@@ -162,7 +175,7 @@ function startExploration() {
     addAIMessage(1, "你好！讓我們開始探索你的經驗。請分享一個讓你印象深刻，或是特別有成就感的經驗。這個經驗可以是任何時候發生的，重要的是它對你來說很有意義。");
 }
 
-// 暴露給全域，以便在 HTML 中直接呼叫
+// 暴露給全域，以便在 HTML 中直接呼叫 (這些主要用於 onclick 屬性)
 window.startExploration = startExploration;
 window.handleStageUserInput = handleStageUserInput;
 window.proceedToNextStage = proceedToNextStage;
@@ -178,6 +191,7 @@ function showStage(stageNumber) {
 
 // Handle user input for each stage
 async function handleStageUserInput(stageNumber) {
+    console.log(`handleStageUserInput: 處理第 ${stageNumber} 階段使用者輸入`);
     const inputElement = document.getElementById(`userInput${stageNumber}`);
     const message = inputElement.value.trim();
     
@@ -186,11 +200,17 @@ async function handleStageUserInput(stageNumber) {
         inputElement.value = '';
         
         // 使用 await 等待特質分析
-        const traits = await TraitAnalyzer.analyzeTraits(message);
-        userTraits = [...userTraits, ...traits];
-        
-        // 使用 await 等待 AI 回應
-        await processAIResponse(stageNumber, message, traits);
+        try {
+            const traits = await TraitAnalyzer.analyzeTraits(message);
+            userTraits = [...userTraits, ...traits];
+            console.log('handleStageUserInput: 特質分析完成', userTraits);
+            
+            // 使用 await 等待 AI 回應
+            await processAIResponse(stageNumber, message, traits);
+        } catch (error) {
+            console.error('handleStageUserInput: 特質分析或 AI 回應失敗', error);
+            addAIMessage(stageNumber, '抱歉，處理您的輸入時發生錯誤。請稍後再試。');
+        }
     }
 }
 
@@ -205,6 +225,7 @@ function addUserMessage(stageNumber, message) {
     
     // Store in chat history
     chatHistory[stageNumber].push({ role: 'user', content: message });
+    console.log(`addUserMessage: 階段 ${stageNumber} - 使用者: ${message}`);
 }
 
 // Add an AI message to the chat
@@ -218,10 +239,12 @@ function addAIMessage(stageNumber, message) {
     
     // Store in chat history
     chatHistory[stageNumber].push({ role: 'ai', content: message });
+    console.log(`addAIMessage: 階段 ${stageNumber} - AI: ${message}`);
 }
 
 // Process AI response based on the stage and user input
 async function processAIResponse(stageNumber, userMessage, traits) {
+    console.log(`processAIResponse: 處理第 ${stageNumber} 階段 AI 回應`);
     try {
         let aiResponse = '';
         
@@ -235,11 +258,14 @@ async function processAIResponse(stageNumber, userMessage, traits) {
         if (stageNumber === 1) {
             suggestedGroups = TraitAnalyzer.suggestLearningGroups(traits);
             suggestedModels = TraitAnalyzer.suggestRoleModels(traits);
+            console.log('processAIResponse: 建議學群', suggestedGroups);
+            console.log('processAIResponse: 建議角色模型', suggestedModels);
             
             // 顯示前往下一階段的按鈕
             const nextButton = document.getElementById('goToStage2Button');
             if (nextButton) {
                 nextButton.style.display = 'block';
+                console.log('processAIResponse: 前往下一階段按鈕顯示');
             }
         }
     } catch (error) {
