@@ -44,6 +44,13 @@
             <button id="goToStage3Button" onclick="proceedToNextStage(3)" class="button button-secondary w-full mt-3" style="display: none;">繼續探索</button>
         </div>
     </div>
-    <script type="module" src="script.js"></script>
+    <script type="module">
+        // 檢查是否在 Canvas 環境中
+        if (typeof window.gemini === 'undefined') {
+            alert('請在 Gemini Canvas 環境中運行此應用');
+            document.getElementById('startButton').disabled = true;
+        }
+    </script>
+    <script type="module" src="./script.js"></script>
 </body>
 </html> 
