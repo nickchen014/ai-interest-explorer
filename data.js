@@ -1,36 +1,259 @@
 // 預設資料結構
 const EXPLORATION_DATA = {
-    // 特質清單
+    // 特質清單 - 基於多維度分類
     traits: {
-        analytical: {
-            id: 'analytical',
-            name: '分析思考',
-            keywords: ['分析', '邏輯', '推理', '思考', '解決問題', '研究', '觀察'],
-            description: '善於分析問題、邏輯推理、系統性思考',
-            relatedTraits: ['critical_thinking', 'problem_solving', 'research']
+        // --- 分析思考維度 ---
+        logical_reasoning: {
+            id: 'logical_reasoning',
+            name: '邏輯推理',
+            description: '善於依據事實和規則進行演繹和歸納，找出因果關係。',
+            keywords: ['邏輯', '推理', '歸納', '演繹', '因果', '條理'],
+            relatedTraits: ['critical_thinking', 'systematic_thinking'],
+            hollandType: 'I' // Investigative
         },
-        creative: {
-            id: 'creative',
-            name: '創意思考',
-            keywords: ['創意', '想像', '創新', '設計', '藝術', '創作', '發想'],
-            description: '具有豐富想像力、創新思維、藝術感知',
-            relatedTraits: ['artistic', 'innovative', 'design_thinking']
+        critical_thinking: {
+            id: 'critical_thinking',
+            name: '批判性思考',
+            description: '能夠客觀評估資訊，提出質疑，並形成獨立見解。',
+            keywords: ['批判', '質疑', '評估', '辨別', '獨立思考', '反思'],
+            relatedTraits: ['logical_reasoning', 'analytical'],
+            hollandType: 'I'
         },
-        social: {
-            id: 'social',
-            name: '社交互動',
-            keywords: ['溝通', '合作', '領導', '團隊', '社交', '表達', '傾聽'],
-            description: '善於人際互動、團隊合作、溝通表達',
-            relatedTraits: ['leadership', 'communication', 'empathy']
+        systematic_thinking: {
+            id: 'systematic_thinking',
+            name: '系統思考',
+            description: '能夠從整體角度分析問題，理解系統中各要素的關聯。',
+            keywords: ['系統', '整體', '關聯', '架構', '脈絡', '整合'],
+            relatedTraits: ['logical_reasoning', 'analytical'],
+            hollandType: 'I'
+        },
+
+        // --- 創意思考維度 ---
+        ideation: {
+            id: 'ideation',
+            name: '點子發想',
+            description: '能夠產生大量、多元且新穎的想法與可能性。',
+            keywords: ['點子', '發想', '腦力激盪', '聯想', '原創性', '靈感'],
+            relatedTraits: ['divergent_thinking', 'innovative'],
+            hollandType: 'A' // Artistic
+        },
+        aesthetic_sense: {
+            id: 'aesthetic_sense',
+            name: '美感鑑賞',
+            description: '對美、和諧與設計有敏銳的直覺和判斷力。',
+            keywords: ['美感', '設計', '藝術', '鑑賞', '和諧', '品味'],
+            relatedTraits: ['artistic', 'creative'],
+            hollandType: 'A'
+        },
+        divergent_thinking: {
+            id: 'divergent_thinking',
+            name: '發散思考',
+            description: '能夠從多個角度思考問題，產生多樣化的解決方案。',
+            keywords: ['發散', '多元', '創新', '突破', '想像', '創意'],
+            relatedTraits: ['ideation', 'creative'],
+            hollandType: 'A'
+        },
+
+        // --- 社交互動維度 ---
+        communication: {
+            id: 'communication',
+            name: '溝通表達',
+            description: '能清晰、有條理地傳達自己的思想與情感。',
+            keywords: ['溝通', '表達', '演說', '寫作', '說明', '傾聽'],
+            relatedTraits: ['social', 'leadership'],
+            hollandType: 'S' // Social
+        },
+        empathy: {
+            id: 'empathy',
+            name: '同理心',
+            description: '能夠理解並關懷他人的感受、觀點與處境。',
+            keywords: ['同理', '關懷', '體貼', '換位思考', '感受'],
+            relatedTraits: ['social', 'helping'],
+            hollandType: 'S'
+        },
+        leadership: {
+            id: 'leadership',
+            name: '領導能力',
+            description: '善於激勵他人、協調團隊，並帶領團隊達成目標。',
+            keywords: ['領導', '激勵', '協調', '團隊', '決策', '影響力'],
+            relatedTraits: ['communication', 'strategic'],
+            hollandType: 'E' // Enterprising
+        },
+
+        // --- 實務操作維度 ---
+        hands_on: {
+            id: 'hands_on',
+            name: '動手實作',
+            description: '享受親自動手解決問題、建造或修理事物。',
+            keywords: ['動手', '實作', '修理', '建造', '操作', '工藝'],
+            relatedTraits: ['practical', 'technical'],
+            hollandType: 'R' // Realistic
+        },
+        technical: {
+            id: 'technical',
+            name: '技術應用',
+            description: '善於運用專業技術和工具解決實際問題。',
+            keywords: ['技術', '專業', '工具', '應用', '操作', '實務'],
+            relatedTraits: ['hands_on', 'practical'],
+            hollandType: 'R'
         },
         practical: {
             id: 'practical',
-            name: '實務操作',
-            keywords: ['實作', '動手', '技術', '執行', '操作', '製作', '實踐'],
-            description: '擅長實際操作、技術應用、問題解決',
-            relatedTraits: ['technical', 'hands_on', 'execution']
+            name: '實務導向',
+            description: '注重實際效果，善於將理論轉化為實踐。',
+            keywords: ['實務', '實踐', '應用', '執行', '效率', '實用'],
+            relatedTraits: ['hands_on', 'technical'],
+            hollandType: 'R'
         },
-        // ... 更多特質
+
+        // --- 工作風格維度 ---
+        organizational: {
+            id: 'organizational',
+            name: '組織規劃',
+            description: '善於規劃流程、管理時程、整合資源以達成目標。',
+            keywords: ['組織', '規劃', '整合', '時間管理', '專案管理', '效率'],
+            relatedTraits: ['systematic_thinking', 'leadership'],
+            hollandType: 'C' // Conventional
+        },
+        detail_oriented: {
+            id: 'detail_oriented',
+            name: '細節導向',
+            description: '注重細節的準確性與完整性，有耐心處理繁瑣事務。',
+            keywords: ['細心', '精確', '耐心', '嚴謹', '校對', '品質'],
+            relatedTraits: ['analytical', 'conventional'],
+            hollandType: 'C'
+        },
+        adaptability: {
+            id: 'adaptability',
+            name: '適應變通',
+            description: '能夠在變動或不確定的環境中保持彈性並快速調整。',
+            keywords: ['適應', '彈性', '變通', '靈活', '應變'],
+            relatedTraits: ['problem_solving', 'entrepreneurial'],
+            hollandType: 'E'
+        }
+    },
+
+    // 角色模型 - 基於 Holland RIASEC 理論
+    roleModels: {
+        // --- R (Realistic) 實務型 ---
+        practical_builder: {
+            id: 'practical_builder',
+            name: '實務建構者',
+            hollandCodes: ['R', 'I'],
+            description: '享受運用具體技術和工具，親手打造、修理或操作事物，並從解決實際問題中獲得成就感。',
+            traits: ['hands_on', 'practical', 'technical', 'problem_solving'],
+            learningGroups: ['engineering', 'biological_resources', 'earth_environmental_sciences'],
+            keywords: ['實作', '技術', '建造', '修理', '操作', '解決問題']
+        },
+        technical_innovator: {
+            id: 'technical_innovator',
+            name: '技術創新者',
+            hollandCodes: ['R', 'A'],
+            description: '善於結合技術與創意，開發新工具或改進現有技術，追求實用與創新的平衡。',
+            traits: ['technical', 'innovative', 'practical', 'creative'],
+            learningGroups: ['engineering', 'information', 'architecture_design'],
+            keywords: ['創新', '技術', '開發', '改進', '實用', '創意']
+        },
+
+        // --- I (Investigative) 研究型 ---
+        knowledge_explorer: {
+            id: 'knowledge_explorer',
+            name: '知識探究者',
+            hollandCodes: ['I', 'A'],
+            description: '對世界充滿好奇，熱衷於透過分析、研究和思考來探索事物背後的原理與真相。',
+            traits: ['logical_reasoning', 'critical_thinking', 'research', 'curious'],
+            learningGroups: ['mathematics_physics_chemistry', 'life_sciences', 'social_psychology'],
+            keywords: ['研究', '探索', '分析', '思考', '發現', '求知']
+        },
+        analytical_researcher: {
+            id: 'analytical_researcher',
+            name: '分析研究者',
+            hollandCodes: ['I', 'C'],
+            description: '善於運用系統化的方法進行研究，注重數據分析和邏輯推理，追求精確的研究結果。',
+            traits: ['analytical', 'systematic_thinking', 'detail_oriented', 'research'],
+            learningGroups: ['mathematics_physics_chemistry', 'life_sciences', 'information'],
+            keywords: ['分析', '研究', '數據', '邏輯', '系統', '精確']
+        },
+
+        // --- A (Artistic) 藝術型 ---
+        aesthetic_creator: {
+            id: 'aesthetic_creator',
+            name: '美感創造者',
+            hollandCodes: ['A', 'S'],
+            description: '善於透過文字、影像、聲音或設計等形式來表達情感與創意，並重視作品的獨創性與美感。',
+            traits: ['aesthetic_sense', 'ideation', 'creative', 'expressive'],
+            learningGroups: ['arts', 'architecture_design', 'mass_communication'],
+            keywords: ['創作', '美感', '設計', '藝術', '表達', '創意']
+        },
+        innovative_designer: {
+            id: 'innovative_designer',
+            name: '創新設計師',
+            hollandCodes: ['A', 'I'],
+            description: '善於結合創意與技術，設計新穎且實用的產品或解決方案，追求美感與功能的平衡。',
+            traits: ['creative', 'innovative', 'technical', 'aesthetic_sense'],
+            learningGroups: ['architecture_design', 'arts', 'information'],
+            keywords: ['設計', '創新', '創意', '技術', '美感', '實用']
+        },
+
+        // --- S (Social) 社交型 ---
+        empathetic_helper: {
+            id: 'empathetic_helper',
+            name: '關懷助人者',
+            hollandCodes: ['S', 'A'],
+            description: '樂於與人互動，善於傾聽、同理與支持他人，並從幫助他人成長與解決困難中獲得滿足。',
+            traits: ['empathy', 'communication', 'helping', 'social'],
+            learningGroups: ['social_psychology', 'education', 'medicine_health'],
+            keywords: ['關懷', '助人', '傾聽', '同理', '支持', '互動']
+        },
+        educational_mentor: {
+            id: 'educational_mentor',
+            name: '教育引導者',
+            hollandCodes: ['S', 'I'],
+            description: '善於傳授知識、引導學習，並能根據學習者的需求調整教學方式，促進他人成長。',
+            traits: ['communication', 'teaching', 'empathy', 'analytical'],
+            learningGroups: ['education', 'social_psychology', 'foreign_languages'],
+            keywords: ['教育', '引導', '教學', '溝通', '啟發', '成長']
+        },
+
+        // --- E (Enterprising) 企業型 ---
+        strategic_leader: {
+            id: 'strategic_leader',
+            name: '策略領導者',
+            hollandCodes: ['E', 'C'],
+            description: '喜歡挑戰與影響他人，善於透過領導、說服與管理來達成目標，並追求成就與影響力。',
+            traits: ['leadership', 'strategic', 'communication', 'organizational'],
+            learningGroups: ['management', 'finance_economics', 'law_political_science'],
+            keywords: ['領導', '策略', '管理', '影響力', '決策', '目標']
+        },
+        entrepreneurial_innovator: {
+            id: 'entrepreneurial_innovator',
+            name: '創業創新者',
+            hollandCodes: ['E', 'A'],
+            description: '善於發現機會、承擔風險，並能將創意轉化為可行的商業模式，追求創新與成長。',
+            traits: ['entrepreneurial', 'innovative', 'strategic', 'adaptability'],
+            learningGroups: ['management', 'finance_economics', 'information'],
+            keywords: ['創業', '創新', '機會', '風險', '商業', '成長']
+        },
+
+        // --- C (Conventional) 事務型 ---
+        system_organizer: {
+            id: 'system_organizer',
+            name: '系統組織者',
+            hollandCodes: ['C', 'R'],
+            description: '偏好在有組織、有條理的環境中工作，善於處理數據、規劃流程，並確保事務的精確與效率。',
+            traits: ['organizational', 'detail_oriented', 'systematic_thinking', 'practical'],
+            learningGroups: ['management', 'finance_economics', 'information'],
+            keywords: ['組織', '系統', '規劃', '效率', '精確', '流程']
+        },
+        analytical_manager: {
+            id: 'analytical_manager',
+            name: '分析管理者',
+            hollandCodes: ['C', 'I'],
+            description: '善於運用數據分析和管理系統，優化組織運作，確保效率和品質。',
+            traits: ['analytical', 'organizational', 'systematic_thinking', 'detail_oriented'],
+            learningGroups: ['management', 'information', 'finance_economics'],
+            keywords: ['分析', '管理', '系統', '數據', '效率', '品質']
+        }
     },
 
     // 學群對應表
@@ -271,72 +494,52 @@ const EXPLORATION_DATA = {
         }
     },
 
-    // 角色模型
-    roleModels: {
-        researcher: {
-            id: 'researcher',
-            name: '研究探索者',
-            description: '熱衷於探索未知、追求真理的研究者',
-            traits: ['analytical', 'research', 'curious'],
-            learningGroups: ['natural_sciences', 'social_sciences'],
-            keywords: ['研究', '實驗', '分析', '探索', '發現']
-        },
-        creator: {
-            id: 'creator',
-            name: '創意實踐家',
-            description: '善於將創意轉化為實際作品的創作者',
-            traits: ['creative', 'practical', 'innovative'],
-            learningGroups: ['arts_humanities', 'engineering'],
-            keywords: ['創作', '設計', '製作', '創新', '實踐']
-        },
-        communicator: {
-            id: 'communicator',
-            name: '溝通協調者',
-            description: '擅長人際互動與團隊合作的溝通者',
-            traits: ['social', 'empathy', 'leadership'],
-            learningGroups: ['social_sciences', 'business'],
-            keywords: ['溝通', '合作', '領導', '協調', '表達']
-        },
-        // ... 更多角色模型
-    },
-
     // 移除原本的 keywordMapping，改用 AI 分析
     // keywordMapping 將由 Gemini 根據 traits 的 keywords 和 description 進行語意分析
 };
 
 // 特質分析工具
 const TraitAnalyzer = {
-    // 從文字中提取關鍵字
-    extractKeywords(text) {
-        const keywords = [];
-        for (const [keyword, traits] of Object.entries(EXPLORATION_DATA.keywordMapping)) {
-            if (text.includes(keyword)) {
-                keywords.push(...traits);
-            }
+    // 使用 Gemini 分析使用者輸入中的特質
+    async analyzeTraits(text) {
+        const prompt = `請分析以下使用者描述的經驗，並根據我們定義的特質資料庫進行語意比對。
+使用者描述：「${text}」
+
+特質資料庫：
+${Object.entries(EXPLORATION_DATA.traits).map(([id, trait]) => 
+    `- ${trait.name} (${id}): ${trait.description}
+  關鍵字：${trait.keywords.join('、')}
+  Holland 類型：${trait.hollandType}`
+).join('\n')}
+
+請根據使用者描述的行為、思考模式和感受，判斷最符合的幾個特質，並給出每個特質的相關程度（0-1分）。
+請以 JSON 格式回傳，格式如下：
+{
+    "traits": [
+        {
+            "id": "特質ID",
+            "score": 相關程度分數,
+            "reason": "為什麼這個特質符合使用者描述",
+            "hollandType": "對應的 Holland 類型"
         }
-        return [...new Set(keywords)]; // 去除重複
-    },
+    ]
+}`;
 
-    // 分析特質傾向
-    analyzeTraits(text) {
-        const keywords = this.extractKeywords(text);
-        const traitScores = {};
-        
-        // 計算每個特質的得分
-        keywords.forEach(traitId => {
-            if (!traitScores[traitId]) {
-                traitScores[traitId] = 0;
-            }
-            traitScores[traitId]++;
-        });
-
-        // 轉換為特質物件陣列並排序
-        return Object.entries(traitScores)
-            .map(([traitId, score]) => ({
-                ...EXPLORATION_DATA.traits[traitId],
-                score
-            }))
-            .sort((a, b) => b.score - a.score);
+        try {
+            const response = await window.gemini.generateText(prompt);
+            const analysis = JSON.parse(response);
+            
+            // 將分析結果轉換為特質物件陣列
+            return analysis.traits.map(trait => ({
+                ...EXPLORATION_DATA.traits[trait.id],
+                score: trait.score,
+                reason: trait.reason,
+                hollandType: trait.hollandType
+            })).sort((a, b) => b.score - a.score);
+        } catch (error) {
+            console.error('特質分析失敗:', error);
+            return [];
+        }
     },
 
     // 根據特質推薦學群
@@ -349,6 +552,7 @@ const TraitAnalyzer = {
                     if (!groupScores[group.id]) {
                         groupScores[group.id] = 0;
                     }
+                    // 使用特質分數加權計算
                     groupScores[group.id] += trait.score;
                 }
             });
@@ -357,7 +561,10 @@ const TraitAnalyzer = {
         return Object.entries(groupScores)
             .map(([groupId, score]) => ({
                 ...EXPLORATION_DATA.learningGroups[groupId],
-                score
+                score,
+                matchingTraits: traits.filter(t => 
+                    EXPLORATION_DATA.learningGroups[groupId].relatedTraits.includes(t.id)
+                )
             }))
             .sort((a, b) => b.score - a.score);
     },
@@ -366,21 +573,36 @@ const TraitAnalyzer = {
     suggestRoleModels(traits) {
         const modelScores = {};
         
+        // 計算每個特質的 Holland 類型分布
+        const hollandScores = {};
         traits.forEach(trait => {
-            Object.values(EXPLORATION_DATA.roleModels).forEach(model => {
-                if (model.traits.includes(trait.id)) {
-                    if (!modelScores[model.id]) {
-                        modelScores[model.id] = 0;
-                    }
-                    modelScores[model.id] += trait.score;
-                }
-            });
+            if (!hollandScores[trait.hollandType]) {
+                hollandScores[trait.hollandType] = 0;
+            }
+            hollandScores[trait.hollandType] += trait.score;
+        });
+
+        // 根據 Holland 類型分數和特質匹配度計算角色模型分數
+        Object.values(EXPLORATION_DATA.roleModels).forEach(model => {
+            const score = model.hollandCodes.reduce((total, code) => 
+                total + (hollandScores[code] || 0), 0) / model.hollandCodes.length;
+            
+            // 計算特質匹配度
+            const traitMatchScore = traits.reduce((total, trait) => 
+                total + (model.traits.includes(trait.id) ? trait.score : 0), 0) / model.traits.length;
+
+            modelScores[model.id] = (score + traitMatchScore) / 2;
         });
 
         return Object.entries(modelScores)
             .map(([modelId, score]) => ({
                 ...EXPLORATION_DATA.roleModels[modelId],
-                score
+                score,
+                matchingTraits: traits.filter(t => 
+                    EXPLORATION_DATA.roleModels[modelId].traits.includes(t.id)
+                ),
+                hollandMatch: EXPLORATION_DATA.roleModels[modelId].hollandCodes
+                    .map(code => ({ type: code, score: hollandScores[code] || 0 }))
             }))
             .sort((a, b) => b.score - a.score);
     }
