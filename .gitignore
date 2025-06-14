@@ -1,0 +1,15 @@
+# macOS 系統自動產生的檔案
+.DS_Store
+
+# VSCode / Cursor 產生的設定檔案
+.vscode/
+.idea/
+
+# Node.js 模組（如果有用）
+node_modules/
+
+# 環境變數與暫存資料
+.env
+dist/
+build/
+*.log
