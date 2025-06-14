@@ -31,7 +31,7 @@
             <p class="text-sm text-gray-600 mb-4">請與AI夥伴聊聊那個讓你印象深刻的經驗。</p>
             <div id="chatLog1" class="chat-log"></div>
             <textarea id="userInput1" rows="3" class="rounded-md w-full p-2 border border-gray-300" placeholder="在這裡輸入您的回應..."></textarea>
-            <button id="sendUserInput1Button" onclick="handleStageUserInput(1)" class="button w-full mt-2">傳送訊息</button>
+            <button id="sendUserInput1Button" onclick="handleStageUserInput(1).catch(console.error)" class="button w-full mt-2">傳送訊息</button>
             <button id="goToStage2Button" onclick="proceedToNextStage(2)" class="button button-secondary w-full mt-3" style="display: none;">很好，前往下一階段：特質推論</button>
         </div>
 
@@ -40,7 +40,7 @@
             <p class="text-sm text-gray-600 mb-4">AI會根據上一階段的對話，推論您的特質並與您討論。</p>
             <div id="chatLog2" class="chat-log"></div>
             <textarea id="userInput2" rows="3" class="rounded-md w-full p-2 border border-gray-300" placeholder="在這裡輸入您的回應..."></textarea>
-            <button id="sendUserInput2Button" onclick="handleStageUserInput(2)" class="button w-full mt-2">傳送訊息</button>
+            <button id="sendUserInput2Button" onclick="handleStageUserInput(2).catch(console.error)" class="button w-full mt-2">傳送訊息</button>
             <button id="goToStage3Button" onclick="proceedToNextStage(3)" class="button button-secondary w-full mt-3" style="display: none;">繼續探索</button>
         </div>
     </div>

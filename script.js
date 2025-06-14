@@ -36,7 +36,7 @@ function showStage(stageNumber) {
 }
 
 // Handle user input for each stage
-function handleStageUserInput(stageNumber) {
+async function handleStageUserInput(stageNumber) {
     const inputElement = document.getElementById(`userInput${stageNumber}`);
     const message = inputElement.value.trim();
     
@@ -48,10 +48,8 @@ function handleStageUserInput(stageNumber) {
         const traits = TraitAnalyzer.analyzeTraits(message);
         userTraits = [...userTraits, ...traits];
         
-        // 根據階段處理回應
-        setTimeout(() => {
-            processAIResponse(stageNumber, message, traits);
-        }, 1000);
+        // 使用 await 等待 AI 回應
+        await processAIResponse(stageNumber, message, traits);
     }
 }
 
@@ -82,57 +80,50 @@ function addAIMessage(stageNumber, message) {
 }
 
 // Process AI response based on the stage and user input
-function processAIResponse(stageNumber, userMessage, traits) {
+async function processAIResponse(stageNumber, userMessage, traits) {
     let aiResponse = '';
     
-    if (stageNumber === 1) {
-        // First stage: Experience reflection
-        if (chatHistory[1].length <= 2) {
-            // 根據特質生成追問
-            const topTrait = traits[0];
-            if (topTrait) {
-                const traitKeywords = EXPLORATION_DATA.traits[topTrait.id].keywords;
-                const randomKeyword = traitKeywords[Math.floor(Math.random() * traitKeywords.length)];
-                aiResponse = `謝謝你的分享！我注意到你提到了一些關於「${randomKeyword}」的內容。能告訴我更多關於這個經驗的細節嗎？比如：\n1. 當時是什麼情況？\n2. 你做了什麼？\n3. 為什麼這個經驗對你來說特別重要？`;
-            } else {
-                aiResponse = "謝謝你的分享！能告訴我更多關於這個經驗的細節嗎？比如：\n1. 當時是什麼情況？\n2. 你做了什麼？\n3. 為什麼這個經驗對你來說特別重要？";
-            }
-        } else {
-            // 分析累積的特質並準備進入下一階段
-            const topTraits = userTraits
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 3);
-            
-            suggestedGroups = TraitAnalyzer.suggestLearningGroups(topTraits);
-            suggestedModels = TraitAnalyzer.suggestRoleModels(topTraits);
-            
-            const traitSummary = topTraits
-                .map(trait => trait.name)
-                .join('、');
-            
-            aiResponse = `從你的分享中，我觀察到你展現了「${traitSummary}」等特質。這些特質都很有價值，讓我們進入下一階段，一起探索這些特質如何形塑你的學習方向。`;
-            document.getElementById('goToStage2Button').style.display = 'block';
-        }
-    } else if (stageNumber === 2) {
-        // Second stage: Trait inference
-        if (chatHistory[2].length <= 2) {
-            // 根據分析結果提供建議
-            const topGroup = suggestedGroups[0];
-            const topModel = suggestedModels[0];
-            
-            aiResponse = `根據你分享的經驗，我觀察到你可能具有以下特質：\n` +
-                `1. ${topGroup.name}相關：${topGroup.description}\n` +
-                `2. 你可能適合的角色：${topModel.name} - ${topModel.description}\n\n` +
-                `你覺得這些特質和方向符合你的自我認知嗎？或者你有不同的想法？`;
-        } else {
-            // 總結探索結果
-            const finalSummary = generateFinalSummary();
-            aiResponse = `謝謝你的分享！讓我們來總結一下這次的探索：\n\n${finalSummary}\n\n你覺得這個過程對你了解自己有什麼幫助嗎？或者還有什麼想探索的方向？`;
-            document.getElementById('goToStage3Button').style.display = 'block';
-        }
-    }
+    // 使用 Canvas 環境中的 Gemini 來生成回應
+    const prompt = generatePrompt(stageNumber, userMessage, traits);
+    aiResponse = await window.gemini.generateText(prompt);
     
     addAIMessage(stageNumber, aiResponse);
+}
+
+// 生成給 Gemini 的提示
+function generatePrompt(stageNumber, userMessage, traits) {
+    const context = {
+        stage: stageNumber,
+        userMessage,
+        traits: traits.map(t => t.name),
+        chatHistory: chatHistory[stageNumber]
+    };
+
+    if (stageNumber === 1) {
+        return `你是一個專業的興趣探索顧問，正在進行第一階段的經驗回溯對話。
+使用者說：「${userMessage}」
+目前分析出的特質傾向：${traits.map(t => t.name).join('、')}
+
+請根據使用者的分享，生成一個自然的回應，重點是：
+1. 展現同理心，理解使用者的經驗
+2. 根據已分析出的特質，提出相關的追問
+3. 引導使用者分享更多細節
+
+請用中文回應，語氣要親切自然。`;
+    } else {
+        return `你是一個專業的興趣探索顧問，正在進行第二階段的特質推論對話。
+使用者說：「${userMessage}」
+目前分析出的特質：${traits.map(t => t.name).join('、')}
+建議的學習方向：${suggestedGroups.map(g => g.name).join('、')}
+建議的角色模型：${suggestedModels.map(m => m.name).join('、')}
+
+請根據以上資訊，生成一個自然的回應，重點是：
+1. 總結使用者的特質傾向
+2. 解釋這些特質如何連結到學習方向
+3. 提供具體的發展建議
+
+請用中文回應，語氣要專業但親切。`;
+    }
 }
 
 // Generate final summary of the exploration
