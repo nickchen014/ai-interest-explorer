@@ -1,0 +1,62 @@
+/* Custom styles */
+.button {
+    @apply bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200;
+}
+
+.button:hover {
+    @apply bg-blue-700;
+}
+
+.button-secondary {
+    @apply bg-gray-200 text-gray-800;
+}
+
+.button-secondary:hover {
+    @apply bg-gray-300;
+}
+
+.progress-bar-container {
+    @apply w-full h-4 bg-gray-200 rounded-full mb-4 overflow-hidden;
+}
+
+.progress-bar {
+    @apply h-full bg-blue-600 text-white text-xs flex items-center justify-center transition-all duration-500;
+    width: 0%;
+}
+
+.chat-log {
+    @apply bg-gray-50 rounded-lg p-4 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto;
+}
+
+.stage {
+    @apply transition-all duration-300;
+}
+
+.stage.hidden {
+    @apply hidden;
+}
+
+/* Chat message styles */
+.chat-message {
+    @apply mb-3 p-3 rounded-lg max-w-[80%];
+}
+
+.user-message {
+    @apply bg-blue-100 ml-auto;
+}
+
+.ai-message {
+    @apply bg-gray-100 mr-auto;
+}
+
+/* Card styles */
+.card {
+    @apply bg-white rounded-xl p-6 shadow-md;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .chat-message {
+        @apply max-w-[90%];
+    }
+} 

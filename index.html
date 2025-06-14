@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 興趣探索互動工具</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-xl">
+        <header class="text-center mb-6">
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar">0%</div>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-600">🎯 AI 興趣探索互動工具</h1>
+            <p class="text-gray-600 mt-2">我的學習地圖建構之旅 🗺️</p>
+        </header>
+
+        <div id="welcomeMessage" class="text-center mb-6">
+            <p class="text-lg text-gray-700 mb-4">
+                <strong>歡迎！我是你的 AI 探索夥伴。</strong><br>
+                準備好一起發掘你獨特的閃光點，找到讓你怦然心動的學習方向了嗎？<br>
+                接下來，我們將透過輕鬆的對話，一步步畫出屬於你的「個人探索回饋卡」。
+            </p>
+            <button id="startButton" class="button">準備好了，開始探索！🚀</button>
+        </div>
+
+        <div id="stage1" class="stage card hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">【第一階段：經驗回溯 – 閃光的隱藏時刻 ✨】</h2>
+            <p class="text-sm text-gray-600 mb-4">請與AI夥伴聊聊那個讓你印象深刻的經驗。</p>
+            <div id="chatLog1" class="chat-log"></div>
+            <textarea id="userInput1" rows="3" class="rounded-md w-full p-2 border border-gray-300" placeholder="在這裡輸入您的回應..."></textarea>
+            <button id="sendUserInput1Button" onclick="handleStageUserInput(1)" class="button w-full mt-2">傳送訊息</button>
+            <button id="goToStage2Button" onclick="proceedToNextStage(2)" class="button button-secondary w-full mt-3" style="display: none;">很好，前往下一階段：特質推論</button>
+        </div>
+
+        <div id="stage2" class="stage card hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">【第二階段：隱形特質推論 – 你是故事裡的超級英雄 🦸】</h2>
+            <p class="text-sm text-gray-600 mb-4">AI會根據上一階段的對話，推論您的特質並與您討論。</p>
+            <div id="chatLog2" class="chat-log"></div>
+            <textarea id="userInput2" rows="3" class="rounded-md w-full p-2 border border-gray-300" placeholder="在這裡輸入您的回應..."></textarea>
+            <button id="sendUserInput2Button" onclick="handleStageUserInput(2)" class="button w-full mt-2">傳送訊息</button>
+            <button id="goToStage3Button" onclick="proceedToNextStage(3)" class="button button-secondary w-full mt-3" style="display: none;">繼續探索</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
