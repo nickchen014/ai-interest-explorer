@@ -12,10 +12,64 @@ let userTraits = [];
 let suggestedGroups = [];
 let suggestedModels = [];
 
+// 初始化 Gemini API
+async function initGeminiAPI() {
+    const apiKey = localStorage.getItem('geminiApiKey');
+    if (!apiKey) {
+        throw new Error('請先設定 Gemini API 金鑰');
+    }
+    
+    // 初始化 Gemini API
+    window.gemini = {
+        async generateText(prompt) {
+            try {
+                const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + apiKey, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API 請求失敗');
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error('Gemini API 錯誤:', error);
+                throw error;
+            }
+        }
+    };
+}
+
 // Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    const startButton = document.getElementById('startButton');
-    startButton.addEventListener('click', startExploration);
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await initGeminiAPI();
+        const startButton = document.getElementById('startButton');
+        if (startButton) {
+            startButton.addEventListener('click', () => {
+                try {
+                    startExploration();
+                } catch (error) {
+                    console.error('啟動探索失敗:', error);
+                    alert('啟動失敗，請確認 API 金鑰是否正確');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('初始化失敗:', error);
+        alert(error.message);
+    }
 });
 
 // Start the exploration process
@@ -81,13 +135,30 @@ function addAIMessage(stageNumber, message) {
 
 // Process AI response based on the stage and user input
 async function processAIResponse(stageNumber, userMessage, traits) {
-    let aiResponse = '';
-    
-    // 使用 Canvas 環境中的 Gemini 來生成回應
-    const prompt = generatePrompt(stageNumber, userMessage, traits);
-    aiResponse = await window.gemini.generateText(prompt);
-    
-    addAIMessage(stageNumber, aiResponse);
+    try {
+        let aiResponse = '';
+        
+        // 使用 Gemini API 生成回應
+        const prompt = generatePrompt(stageNumber, userMessage, traits);
+        aiResponse = await window.gemini.generateText(prompt);
+        
+        addAIMessage(stageNumber, aiResponse);
+
+        // 如果是第一階段，更新建議
+        if (stageNumber === 1) {
+            suggestedGroups = TraitAnalyzer.suggestLearningGroups(traits);
+            suggestedModels = TraitAnalyzer.suggestRoleModels(traits);
+            
+            // 顯示前往下一階段的按鈕
+            const nextButton = document.getElementById('goToStage2Button');
+            if (nextButton) {
+                nextButton.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.error('AI 回應生成失敗:', error);
+        addAIMessage(stageNumber, '抱歉，我現在無法回應。請確認 API 金鑰是否正確，或稍後再試。');
+    }
 }
 
 // 生成給 Gemini 的提示

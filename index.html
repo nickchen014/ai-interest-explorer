@@ -17,7 +17,18 @@
             <p class="text-gray-600 mt-2">我的學習地圖建構之旅 🗺️</p>
         </header>
 
-        <div id="welcomeMessage" class="text-center mb-6">
+        <!-- API 金鑰輸入區域 -->
+        <div id="apiKeySection" class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-800 mb-2">Gemini API 設定</h2>
+            <div class="flex flex-col space-y-2">
+                <input type="password" id="apiKeyInput" class="rounded-md p-2 border border-gray-300" 
+                       placeholder="請輸入您的 Gemini API 金鑰">
+                <button id="saveApiKeyButton" class="button">儲存 API 金鑰</button>
+                <p id="apiKeyStatus" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+
+        <div id="welcomeMessage" class="text-center mb-6 hidden">
             <p class="text-lg text-gray-700 mb-4">
                 <strong>歡迎！我是你的 AI 探索夥伴。</strong><br>
                 準備好一起發掘你獨特的閃光點，找到讓你怦然心動的學習方向了嗎？<br>
@@ -45,10 +56,41 @@
         </div>
     </div>
     <script type="module">
-        // 檢查是否在 Canvas 環境中
-        if (typeof window.gemini === 'undefined') {
-            alert('請在 Gemini Canvas 環境中運行此應用');
-            document.getElementById('startButton').disabled = true;
+        // 初始化 API 金鑰管理
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveApiKeyButton = document.getElementById('saveApiKeyButton');
+        const apiKeyStatus = document.getElementById('apiKeyStatus');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const startButton = document.getElementById('startButton');
+
+        // 從 localStorage 讀取 API 金鑰
+        const savedApiKey = localStorage.getItem('geminiApiKey');
+        if (savedApiKey) {
+            apiKeyInput.value = savedApiKey;
+            apiKeyStatus.textContent = '已載入已儲存的 API 金鑰';
+            apiKeyStatus.className = 'text-sm text-green-600';
+            welcomeMessage.classList.remove('hidden');
+        }
+
+        // 儲存 API 金鑰
+        saveApiKeyButton.addEventListener('click', () => {
+            const apiKey = apiKeyInput.value.trim();
+            if (apiKey) {
+                localStorage.setItem('geminiApiKey', apiKey);
+                apiKeyStatus.textContent = 'API 金鑰已儲存';
+                apiKeyStatus.className = 'text-sm text-green-600';
+                welcomeMessage.classList.remove('hidden');
+            } else {
+                apiKeyStatus.textContent = '請輸入有效的 API 金鑰';
+                apiKeyStatus.className = 'text-sm text-red-600';
+            }
+        });
+
+        // 檢查 API 金鑰是否已設定
+        if (!savedApiKey) {
+            apiKeyStatus.textContent = '請先輸入 Gemini API 金鑰';
+            apiKeyStatus.className = 'text-sm text-yellow-600';
+            welcomeMessage.classList.add('hidden');
         }
     </script>
     <script type="module" src="./script.js"></script>
