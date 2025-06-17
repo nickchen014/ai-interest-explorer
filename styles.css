@@ -1,18 +1,18 @@
 /* Custom styles */
 .button {
-    @apply bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200;
+    @apply bg-blue-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 border border-blue-600;
 }
 
 .button:hover {
-    @apply bg-blue-700;
+    @apply bg-blue-700 border-blue-700;
 }
 
 .button-secondary {
-    @apply bg-gray-200 text-gray-800;
+    @apply bg-gray-200 text-gray-800 border border-gray-200;
 }
 
 .button-secondary:hover {
-    @apply bg-gray-300;
+    @apply bg-gray-300 border-gray-300;
 }
 
 .progress-bar-container {
@@ -38,15 +38,15 @@
 
 /* Chat message styles */
 .chat-message {
-    @apply mb-3 p-3 rounded-lg max-w-[80%];
+    @apply mb-3 p-3 rounded-lg max-w-[80%] shadow-sm;
 }
 
 .user-message {
-    @apply bg-blue-100 ml-auto;
+    @apply bg-blue-100 ml-auto border border-blue-200;
 }
 
 .ai-message {
-    @apply bg-gray-100 mr-auto;
+    @apply bg-gray-100 mr-auto border border-gray-200;
 }
 
 /* Card styles */
