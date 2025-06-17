@@ -605,7 +605,4 @@ ${Object.entries(EXPLORATION_DATA.traits).map(([id, trait]) =>
             }))
             .sort((a, b) => b.score - a.score);
     }
-};
-
-// 導出資料和工具
-export { EXPLORATION_DATA, TraitAnalyzer }; 
+}; 
